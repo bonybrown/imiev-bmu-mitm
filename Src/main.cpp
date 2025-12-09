@@ -15,11 +15,12 @@
   *
   ******************************************************************************
   */
+
 #include "main.h"
 #include "can.h"
 #include "iwdg.h"
 #include "gpio.h"
-
+#include <stdint.h>
 #include "stdio.h"
 #include <string.h>
 #include "can-bridge-firmware.h"
@@ -34,9 +35,51 @@ static uint8_t idleTick = 0;
 
 void SystemClock_Config(void);
 
+int main(void){
+  HAL_Init();
+  __HAL_RCC_GPIOB_CLK_ENABLE();
+  __HAL_RCC_GPIOA_CLK_ENABLE();
+  
+  GPIO_InitTypeDef gpio_init = {0};
+  gpio_init.Pin = GPIO_PIN_6;
+  gpio_init.Mode = GPIO_MODE_OUTPUT_PP;
+  gpio_init.Pull = GPIO_NOPULL;
+  gpio_init.Speed = GPIO_SPEED_FREQ_HIGH;
+  HAL_GPIO_Init(GPIOB, &gpio_init);
+  gpio_init.Pin = GPIO_PIN_2;
+  gpio_init.Mode = GPIO_MODE_OUTPUT_PP;
+  gpio_init.Pull = GPIO_NOPULL;
+  gpio_init.Speed = GPIO_SPEED_FREQ_HIGH;
+loop:
+  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_6, GPIO_PIN_SET);
+  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_2, GPIO_PIN_RESET);
+  HAL_Delay(500);
+  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_6, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_2, GPIO_PIN_SET);
+  HAL_Delay(500);
+  goto loop;
+
+  // HAL_Init();
+  // SystemClock_Config();
+  // //MX_GPIO_Init();
+  // GPIO_InitTypeDef gpio_init = {0};
+  // gpio_init.Pin = GPIO_PIN_6;
+  // gpio_init.Mode = GPIO_MODE_OUTPUT_PP;
+  // gpio_init.Pull = GPIO_NOPULL;
+  // gpio_init.Speed = GPIO_SPEED_FREQ_LOW;
+  // HAL_GPIO_Init(GPIOB, &gpio_init);
+  // while(true)
+  // {
+  // //HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_6);
+  // HAL_GPIO_WritePin(GPIOB, GPIO_PIN_6, GPIO_PIN_RESET);
+  // HAL_Delay(500);
+  // HAL_GPIO_WritePin(GPIOB, GPIO_PIN_6, GPIO_PIN_SET);
+  // HAL_Delay(500);
+  // }
+}
 
 
-int main(void)
+int zzmain(void)
 {
 	 
 	

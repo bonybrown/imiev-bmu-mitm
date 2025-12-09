@@ -1,0 +1,30 @@
+# CMake build directory
+build/
+cmake-build-*/
+
+# Build artifacts
+*.elf
+*.hex
+*.bin
+*.srec
+*.map
+*.lst
+*.o
+*.d
+*.su
+
+# CMake files
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+Makefile
+compile_commands.json
+
+# IDE
+.vscode/
+.idea/
+*.code-workspace
+
+# CppUTest build artifacts (keep source)
+cpputest/build/
+cpputest/cpputest_build/

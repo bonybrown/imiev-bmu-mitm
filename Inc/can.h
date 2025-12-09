@@ -27,6 +27,8 @@ extern "C" {
 
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "can_types.h"
+#include <stm32f1xx_hal.h>
 
 /* USER CODE BEGIN Includes */
 
@@ -59,15 +61,7 @@ void MX_CAN1_Init(void);
 void MX_CAN2_Init(void);
 
 /* USER CODE BEGIN Prototypes */
-typedef struct
-{
-    uint32_t    ID;
-    uint8_t     dlc;
-    uint8_t     ide;
-    uint8_t     rtr;
-    uint8_t     pad;
-    uint8_t     data[8];
-}CAN_FRAME;
+
 
 typedef enum
 {

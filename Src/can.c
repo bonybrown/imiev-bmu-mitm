@@ -342,9 +342,12 @@ void sendCan( uint8_t channel )
     
     if( LenCan( channel, CAN_TX ) )
     {
+      //TODO: Why must we check for 3 free mailboxes? Should be enough to check for at least 1 free mailbox
         if( HAL_CAN_GetTxMailboxesFreeLevel( CANChanRef[ channel ] ) == 3 )
         {
             PopCan( channel, CAN_TX, &frame );
+            //TODO: let's not copy the data from frame.data to data[] but use frame.data directly in HAL_CAN_AddTxMessage
+            //TODO: CanTxToSTM should just transform the frame header to CAN_TxHeaderTypeDef
             CanTxToSTM(&frame, &header, data);
             HAL_CAN_AddTxMessage( CANChanRef[ channel ], &header, data, &mailbox );
         }
