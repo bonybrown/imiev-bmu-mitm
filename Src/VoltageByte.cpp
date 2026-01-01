@@ -15,10 +15,12 @@ const VoltageByte v392 = VoltageByte::fromVoltage(3.92f);
 const VoltageByte v400 = VoltageByte::fromVoltage(4.00f);
 const VoltageByte v420 = VoltageByte::fromVoltage(4.20f);
 
-VoltageByte VoltageByte::getMaxVoltage() {
+VoltageByte VoltageByte::getMaxVoltage()
+{
     return v420;
 }
 
-VoltageByte VoltageByte::getMinVoltage() {
+VoltageByte VoltageByte::getMinVoltage()
+{
     return v275;
 }

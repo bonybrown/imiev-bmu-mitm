@@ -8,14 +8,10 @@
 #include <stdint.h>
 #include <limits.h>
 
-TEST_GROUP(CalculateTickDifference_NormalOperation)
-{
-    void setup() {
-    }
-    
-    void teardown() {
-    }
-};
+TEST_GROUP(CalculateTickDifference_NormalOperation){
+    void setup(){}
+
+    void teardown(){}};
 
 TEST(CalculateTickDifference_NormalOperation, NoTimePassed)
 {
@@ -53,14 +49,10 @@ TEST(CalculateTickDifference_NormalOperation, LargeNormalDifference)
     LONGS_EQUAL(500000, diff);
 }
 
-TEST_GROUP(CalculateTickDifference_Overflow)
-{
-    void setup() {
-    }
-    
-    void teardown() {
-    }
-};
+TEST_GROUP(CalculateTickDifference_Overflow){
+    void setup(){}
+
+    void teardown(){}};
 
 TEST(CalculateTickDifference_Overflow, OverflowByOne)
 {
@@ -111,14 +103,10 @@ TEST(CalculateTickDifference_Overflow, MultipleMillionTicksAcrossOverflow)
     LONGS_EQUAL(2000001, diff);
 }
 
-TEST_GROUP(CalculateTickDifference_EdgeCases)
-{
-    void setup() {
-    }
-    
-    void teardown() {
-    }
-};
+TEST_GROUP(CalculateTickDifference_EdgeCases){
+    void setup(){}
+
+    void teardown(){}};
 
 TEST(CalculateTickDifference_EdgeCases, BothZero)
 {
@@ -164,33 +152,29 @@ TEST(CalculateTickDifference_EdgeCases, CompleteWrapMinusOne)
     LONGS_EQUAL(UINT32_MAX, diff);
 }
 
-TEST_GROUP(CalculateTickDifference_Sequence)
-{
-    void setup() {
-    }
-    
-    void teardown() {
-    }
-};
+TEST_GROUP(CalculateTickDifference_Sequence){
+    void setup(){}
+
+    void teardown(){}};
 
 TEST(CalculateTickDifference_Sequence, SequentialNormalCalls)
 {
     uint32_t last = 1000;
     uint32_t current;
     uint32_t diff;
-    
+
     // First increment
     current = 1001;
     diff = CalculateTickDifference(current, last);
     LONGS_EQUAL(1, diff);
     last = current;
-    
+
     // Second increment
     current = 1010;
     diff = CalculateTickDifference(current, last);
     LONGS_EQUAL(9, diff);
     last = current;
-    
+
     // Third increment
     current = 1100;
     diff = CalculateTickDifference(current, last);
@@ -202,25 +186,25 @@ TEST(CalculateTickDifference_Sequence, SequenceThroughOverflow)
     uint32_t last = UINT32_MAX - 5;
     uint32_t current;
     uint32_t diff;
-    
+
     // Increment towards max
     current = UINT32_MAX - 3;
     diff = CalculateTickDifference(current, last);
     LONGS_EQUAL(2, diff);
     last = current;
-    
+
     // Reach max
     current = UINT32_MAX;
     diff = CalculateTickDifference(current, last);
     LONGS_EQUAL(3, diff);
     last = current;
-    
+
     // Overflow to 0
     current = 0;
     diff = CalculateTickDifference(current, last);
     LONGS_EQUAL(1, diff);
     last = current;
-    
+
     // Continue after overflow
     current = 10;
     diff = CalculateTickDifference(current, last);
@@ -231,7 +215,7 @@ TEST(CalculateTickDifference_Sequence, RepeatedSmallIncrements)
 {
     uint32_t last = 0;
     uint32_t current;
-    
+
     for (int i = 1; i <= 100; i++)
     {
         current = i;

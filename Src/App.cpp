@@ -1,45 +1,65 @@
 /**
  * @file App.cpp
  * @brief Implementation of the App class
- * 
+ *
  * This provides the default implementation of the App class methods.
  */
 
 #include "App.h"
 #include "CanQueue.h"
-
+#include <CanMessage373.h>
+#include <stdio.h>
+#include <CanMessage374.h>
 /**
  * @brief Process received CAN messages
  */
-void App::canMsgReceived(const CAN_FRAME& frame) {
-        // Send messages back on the opposite channel
-        CAN_FRAME response = frame;
-        response.tx_channel = frame.rx_channel ? 0 : 1; // Send back on opposite channel
-        
-        // Push the response to the TxQueue
-        m_txQueue->push(response);
-        
-        // Add your custom message processing logic here
-        // For example:
-        // - Parse message data
-        // - Update internal state
-        // - Generate responses
-        // - Store values for later processing
+void App::canMsgReceived(const CAN_FRAME &frame)
+{
+    // copy the frame to modify if needed
+    CAN_FRAME response = frame;
+
+    // Update the battery model with data from message 0x373, received every 100ms
+    if (frame.ID == 0x373)
+    {
+        CanMessage373 rxMsg(&frame);
+        VoltageByte cellMin = rxMsg.getCellMinVoltage();
+        float packCurrent = rxMsg.getPackCurrent();
+        m_batteryModel->update(cellMin, packCurrent, 100); // deltaTMs = 100ms
     }
-    
+
+    // Modify message 0x374 with updated SoC values
+    else if (frame.ID == 0x374)
+    {
+        CanMessage374 rxMsg(&frame);
+        // Modify some fields before sending back
+        rxMsg.setBatteryCapacity(m_batteryModel->getCapacity());
+        rxMsg.setSoC1(m_batteryModel->getSoC1());
+        rxMsg.setSoC2(m_batteryModel->getSoC2());
+        // Leave temperatures unchanged
+        response = *(rxMsg.getFrame());
+    }
+
+    // Send responses back on opposite channel they were received from
+    response.tx_channel = frame.rx_channel ? 0 : 1;
+    // Push the response to the TxQueue
+    m_txQueue->push(response);
+}
+
 /**
  * @brief Handle periodic time ticks
  */
-void App::timeTickMs(uint32_t ms) {
+void App::timeTickMs(uint32_t ms)
+{
     m_ticks += ms;
 
     m_one_second -= ms;
-    if (m_one_second <= 0) {
+    if (m_one_second <= 0)
+    {
         m_one_second += 1000;
         m_seconds++;
         sendHeartbeat();
-    }        
-    
+    }
+
     // Add your periodic tasks here:
     // - Check timeouts
     // - Update state machines
@@ -50,14 +70,15 @@ void App::timeTickMs(uint32_t ms) {
 /**
  * @brief Send a heartbeat CAN message
  */
-void App::sendHeartbeat() {
+void App::sendHeartbeat()
+{
     CAN_FRAME heartbeat;
-    heartbeat.ID = 0x720;  // Example heartbeat ID
+    heartbeat.ID = 0x720; // Example heartbeat ID
     heartbeat.dlc = 8;
     heartbeat.ide = 0;
     heartbeat.rtr = 0;
     heartbeat.tx_channel = 0;
-    
+
     heartbeat.data[0] = (m_seconds >> 24) & 0xFF;
     heartbeat.data[1] = (m_seconds >> 16) & 0xFF;
     heartbeat.data[2] = (m_seconds >> 8) & 0xFF;
@@ -66,11 +87,11 @@ void App::sendHeartbeat() {
     heartbeat.data[5] = 0; // Reserved
     heartbeat.data[6] = 0; // Reserved
     heartbeat.data[7] = 0; // Reserved
-    
+
     // Queue for transmission
-    //m_txQueue->push(heartbeat);
+    // m_txQueue->push(heartbeat);
 
     heartbeat.tx_channel = 1;
-    heartbeat.ID = 0x721;  // Example heartbeat ID for second channel
+    heartbeat.ID = 0x721; // Example heartbeat ID for second channel
     m_txQueue->push(heartbeat);
 }

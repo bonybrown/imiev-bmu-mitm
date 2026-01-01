@@ -12,9 +12,12 @@
 
 #include <stdint.h>
 #include "can_types.h"
+#include "BatteryModel.h"
 
 // Forward declaration
 template<uint16_t CAPACITY> class CanQueue;
+
+const float BATTERY_PACK_AH_CAPACITY = 93.0f; // Battery capacity in amp-hours
 
 /**
  * @class App
@@ -27,11 +30,12 @@ template<uint16_t CAPACITY> class CanQueue;
  */
 class App {
 public:
-    App(CanQueue<QUEUE_CAPACITY>* txQueue) :
+    App(CanQueue<QUEUE_CAPACITY>* txQueue, BatteryModel*batteryModel) :
      m_txQueue(txQueue),
      m_ticks(0), 
      m_one_second(1000),
-     m_seconds(0) {}
+     m_seconds(0),
+     m_batteryModel(batteryModel) {} 
     /**
      * @brief Called when a CAN message is received
      * @param frame The received CAN frame
@@ -55,6 +59,7 @@ protected:
     uint32_t m_ticks;         ///< Internal tick counter
     int32_t m_one_second;    ///< Counter for one second intervals
     uint32_t m_seconds;      ///< Elapsed seconds counter
+    BatteryModel* m_batteryModel; ///< Pointer to the BatteryModel instance
     /**
      * @brief Send a heartbeat CAN message
      */

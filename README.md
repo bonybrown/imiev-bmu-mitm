@@ -45,5 +45,5 @@ TODO => not a small piece , add a RS232 to monitor / configure features....
 
 
 ## SOC2 Voltage->SOC transfer function
-Implementation in `VoltageByte.toSoC2()`
+Implementation in `BatteryModel::voltageToSoC2()`
 ![transfer function](soc2_transfer_function.png)

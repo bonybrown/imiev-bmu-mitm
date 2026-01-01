@@ -6,14 +6,10 @@
 #include "CppUTest/TestHarness.h"
 #include "VoltageByte.h"
 
-TEST_GROUP(VoltageByte_Construction)
-{
-    void setup() {
-    }
-    
-    void teardown() {
-    }
-};
+TEST_GROUP(VoltageByte_Construction){
+    void setup(){}
+
+    void teardown(){}};
 
 TEST(VoltageByte_Construction, DefaultConstructor)
 {
@@ -39,14 +35,10 @@ TEST(VoltageByte_Construction, MaxValue)
     LONGS_EQUAL(255, v.get());
 }
 
-TEST_GROUP(VoltageByte_Conversion)
-{
-    void setup() {
-    }
-    
-    void teardown() {
-    }
-};
+TEST_GROUP(VoltageByte_Conversion){
+    void setup(){}
+
+    void teardown(){}};
 
 TEST(VoltageByte_Conversion, FromMinimumVoltage)
 {
@@ -121,21 +113,17 @@ TEST(VoltageByte_Conversion, ExplicitCastToUint8)
     LONGS_EQUAL(123, raw);
 }
 
-TEST_GROUP(VoltageByte_Comparison)
-{
-    void setup() {
-    }
-    
-    void teardown() {
-    }
-};
+TEST_GROUP(VoltageByte_Comparison){
+    void setup(){}
+
+    void teardown(){}};
 
 TEST(VoltageByte_Comparison, Equality)
 {
     VoltageByte v1(100);
     VoltageByte v2(100);
     VoltageByte v3(101);
-    
+
     CHECK(v1 == v2);
     CHECK_FALSE(v1 == v3);
 }
@@ -144,7 +132,7 @@ TEST(VoltageByte_Comparison, Inequality)
 {
     VoltageByte v1(100);
     VoltageByte v2(101);
-    
+
     CHECK(v1 != v2);
     CHECK_FALSE(v1 != v1);
 }
@@ -153,7 +141,7 @@ TEST(VoltageByte_Comparison, LessThan)
 {
     VoltageByte v1(100);
     VoltageByte v2(101);
-    
+
     CHECK(v1 < v2);
     CHECK_FALSE(v2 < v1);
     CHECK_FALSE(v1 < v1);
@@ -163,7 +151,7 @@ TEST(VoltageByte_Comparison, GreaterThan)
 {
     VoltageByte v1(100);
     VoltageByte v2(101);
-    
+
     CHECK(v2 > v1);
     CHECK_FALSE(v1 > v2);
     CHECK_FALSE(v1 > v1);
@@ -173,7 +161,7 @@ TEST(VoltageByte_Comparison, LessThanOrEqual)
 {
     VoltageByte v1(100);
     VoltageByte v2(101);
-    
+
     CHECK(v1 <= v2);
     CHECK(v1 <= v1);
     CHECK_FALSE(v2 <= v1);
@@ -183,33 +171,26 @@ TEST(VoltageByte_Comparison, GreaterThanOrEqual)
 {
     VoltageByte v1(100);
     VoltageByte v2(101);
-    
+
     CHECK(v2 >= v1);
     CHECK(v1 >= v1);
     CHECK_FALSE(v1 >= v2);
 }
 
+TEST_GROUP(VoltageByte_UsageScenarios){
+    void setup(){}
 
-
-
-TEST_GROUP(VoltageByte_UsageScenarios)
-{
-    void setup() {
-    }
-    
-    void teardown() {
-    }
-};
+    void teardown(){}};
 
 TEST(VoltageByte_UsageScenarios, CANBufferWrite)
 {
     // Simulate writing voltage to CAN buffer
     uint8_t can_buffer[8] = {0};
     VoltageByte voltage = VoltageByte::fromVoltage(3.7f);
-    
+
     // Must use explicit cast to write to buffer
     can_buffer[0] = static_cast<uint8_t>(voltage);
-    
+
     LONGS_EQUAL(160, can_buffer[0]);
 }
 
@@ -217,10 +198,10 @@ TEST(VoltageByte_UsageScenarios, CANBufferRead)
 {
     // Simulate reading voltage from CAN buffer
     uint8_t can_buffer[8] = {160, 0, 0, 0, 0, 0, 0, 0};
-    
+
     // Must use explicit constructor to create from raw byte
     VoltageByte voltage(can_buffer[0]);
-    
+
     DOUBLES_EQUAL(3.7f, voltage.toVoltage(), 0.01f);
 }
 
@@ -230,21 +211,17 @@ TEST(VoltageByte_UsageScenarios, CompareVoltages)
     VoltageByte cell1 = VoltageByte::fromVoltage(3.65f);
     VoltageByte cell2 = VoltageByte::fromVoltage(3.70f);
     VoltageByte cell3 = VoltageByte::fromVoltage(3.68f);
-    
+
     // Can use comparison operators directly
     CHECK(cell1 < cell2);
     CHECK(cell2 > cell3);
     CHECK(cell3 > cell1);
 }
 
-TEST_GROUP(VoltageByte_Constants)
-{
-    void setup() {
-    }
-    
-    void teardown() {
-    }
-};
+TEST_GROUP(VoltageByte_Constants){
+    void setup(){}
+
+    void teardown(){}};
 
 TEST(VoltageByte_Constants, GetMaxVoltage)
 {

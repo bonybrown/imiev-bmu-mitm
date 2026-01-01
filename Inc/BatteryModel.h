@@ -27,12 +27,17 @@ public:
     BatteryModel(float capacity);
     
     /**
+     * @brief Virtual destructor
+     */
+    virtual ~BatteryModel() = default;
+    
+    /**
      * @brief Update model with cell voltage and pack current
      * @param cellMinVoltage Minimum cell voltage in the pack
      * @param packCurrent Pack current in amps (positive = charging, negative = discharging)
      * @param deltaTMs Time elapsed since last update in milliseconds
      */
-    void update(VoltageByte cellMinVoltage, float packCurrent, uint32_t deltaTMs);
+    virtual void update(VoltageByte cellMinVoltage, float packCurrent, uint32_t deltaTMs);
     
     /**
      * @brief Get state of charge based on coulomb counting

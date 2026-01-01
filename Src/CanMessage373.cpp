@@ -9,8 +9,8 @@
  * @brief Construct from CAN frame pointer
  * @param frame Pointer to CAN_FRAME structure
  */
-CanMessage373::CanMessage373(const CAN_FRAME* frame)
-    : frame_(const_cast<CAN_FRAME*>(frame))
+CanMessage373::CanMessage373(const CAN_FRAME *frame)
+    : frame_(const_cast<CAN_FRAME *>(frame))
 {
 }
 
@@ -34,26 +34,26 @@ VoltageByte CanMessage373::getCellMinVoltage() const
 
 /**
  * @brief Get battery pack current in amperes
- * 
+ *
  * Current is encoded as: (D2 * 256 + D3 - 32768) / 100
  * Positive values indicate charging, negative values indicate discharging.
- * 
+ *
  * Note: Using 32700 instead of 32768 as the calibrated zero point.
- * 
+ *
  * @return Current in amps
  */
 float CanMessage373::getPackCurrent() const
 {
     uint8_t ah = frame_->data[2];
     uint8_t al = frame_->data[3];
-    return ((ah << 8 ) + al - 32700) / 100.0f;
+    return ((ah << 8) + al - 32700) / 100.0f;
 }
 
 /**
  * @brief Get battery pack voltage in volts
- * 
+ *
  * Pack voltage is encoded as: (D4 * 256 + D5) / 10
- * 
+ *
  * @return Pack voltage in volts
  */
 float CanMessage373::getPackVoltage() const
@@ -62,4 +62,3 @@ float CanMessage373::getPackVoltage() const
     uint8_t vl = frame_->data[5];
     return ((vh << 8) + vl) / 10.0f;
 }
-

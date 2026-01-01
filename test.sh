@@ -125,19 +125,19 @@ if [ $TEST_RESULT -eq 0 ]; then
         
         if command -v lcov &> /dev/null; then
             echo -e "${BLUE}Capturing coverage data...${NC}"
-            lcov --capture --directory . --output-file coverage.info 2>/dev/null
+            lcov --capture --directory . --output-file coverage.info --ignore-errors inconsistent,mismatch 2>&1 | grep -v "geninfo: WARNING"
             
             echo -e "${BLUE}Filtering coverage data...${NC}"
             # Remove system headers
-            lcov --remove coverage.info '/usr/*' --output-file coverage.info 2>/dev/null
+            lcov --remove coverage.info '/usr/*' --output-file coverage.info --ignore-errors unused 2>/dev/null
             # Remove CppUTest library code
-            lcov --remove coverage.info '*/cpputest/*' --output-file coverage.info 2>/dev/null
-            lcov --remove coverage.info '*/cpputest-build/*' --output-file coverage.info 2>/dev/null
+            lcov --remove coverage.info '*/cpputest/*' --output-file coverage.info --ignore-errors unused 2>/dev/null
+            lcov --remove coverage.info '*/cpputest-build/*' --output-file coverage.info --ignore-errors unused 2>/dev/null
             # Remove build directory artifacts
-            lcov --remove coverage.info '*/build/*' --output-file coverage.info 2>/dev/null
+            lcov --remove coverage.info '*/build/*' --output-file coverage.info --ignore-errors unused 2>/dev/null
             # Remove test runner and test case files, but keep source files being tested
-            lcov --remove coverage.info '*/test_main.cpp' --output-file coverage.info 2>/dev/null
-            lcov --remove coverage.info '*/test_*.cpp' --output-file coverage.info 2>/dev/null
+            lcov --remove coverage.info '*/test_main.cpp' --output-file coverage.info --ignore-errors unused 2>/dev/null
+            lcov --remove coverage.info '*/test_*.cpp' --output-file coverage.info --ignore-errors unused 2>/dev/null
             
             if command -v genhtml &> /dev/null; then
                 echo -e "${BLUE}Generating HTML report...${NC}"

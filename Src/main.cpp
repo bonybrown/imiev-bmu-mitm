@@ -32,7 +32,8 @@
 static CanQueue<QUEUE_CAPACITY> g_rxQueue;
 static CanQueue<QUEUE_CAPACITY> g_TxQueue;
 // Create App
-App g_app(&g_TxQueue);
+BatteryModel g_batteryModel(BATTERY_PACK_AH_CAPACITY);
+App g_app(&g_TxQueue, &g_batteryModel);
 uint32_t g_lastTickTime = 0;
 
 // Function prototypes
@@ -118,7 +119,7 @@ void InitializeHardware(void)
  * @param frame Pointer to store the popped CAN frame
  * @return true if a frame was popped, false if the queue was empty
  */
-inline bool SafePopCanQueue(CanQueue<QUEUE_CAPACITY>& queue, CAN_FRAME* frame)
+inline bool SafePopCanQueue(CanQueue<QUEUE_CAPACITY> &queue, CAN_FRAME *frame)
 {
     __disable_irq();
     bool result = queue.pop(frame);
