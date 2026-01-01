@@ -3,5 +3,6 @@
         "voltagebyte.h": "c",
         "stm32f105xc.h": "c",
         "stm32f1xx_hal_can.h": "c"
-    }
+    },
+    "C_Cpp.default.compilerPath": "/usr/bin/g++"
 }

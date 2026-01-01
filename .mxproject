@@ -8,24 +8,39 @@ CDefines=USE_HAL_DRIVER;STM32F105xC;USE_HAL_DRIVER;USE_HAL_DRIVER;
 
 [PreviousGenFiles]
 AdvancedFolderStructure=true
-HeaderFileListSize=6
-HeaderFiles#0=..\Core\Inc\gpio.h
-HeaderFiles#1=..\Core\Inc\can.h
-HeaderFiles#2=..\Core\Inc\iwdg.h
-HeaderFiles#3=..\Core\Inc\stm32f1xx_it.h
-HeaderFiles#4=..\Core\Inc\stm32f1xx_hal_conf.h
-HeaderFiles#5=..\Core\Inc\main.h
+
+# Updated header files
+HeaderFileListSize=8
+HeaderFiles#0=Inc\can-bridge-firmware.h
+HeaderFiles#1=Inc\can.h
+HeaderFiles#2=Inc\can_types.h
+HeaderFiles#3=Inc\gpio.h
+HeaderFiles#4=Inc\iwdg.h
+HeaderFiles#5=Inc\main.h
+HeaderFiles#6=Inc\stm32f1xx_hal_conf.h
+HeaderFiles#7=Inc\stm32f1xx_it.h
 HeaderFolderListSize=1
-HeaderPath#0=..\Core\Inc
+HeaderPath#0=Inc
 HeaderFiles=;
-SourceFileListSize=6
-SourceFiles#0=..\Core\Src\gpio.c
-SourceFiles#1=..\Core\Src\can.c
-SourceFiles#2=..\Core\Src\iwdg.c
-SourceFiles#3=..\Core\Src\stm32f1xx_it.c
-SourceFiles#4=..\Core\Src\stm32f1xx_hal_msp.c
-SourceFiles#5=..\Core\Src\main.c
+
+# Updated source files
+SourceFileListSize=15
+SourceFiles#0=Src\CanMessage373.cpp
+SourceFiles#1=Src\CanMessage373.h
+SourceFiles#2=Src\CanMessage374.cpp
+SourceFiles#3=Src\CanMessage374.h
+SourceFiles#4=Src\CanQueue.h
+SourceFiles#5=Src\VoltageByte.cpp
+SourceFiles#6=Src\VoltageByte.h
+SourceFiles#7=Src\can-bridge-firmware.cpp
+SourceFiles#8=Src\can.c
+SourceFiles#9=Src\gpio.c
+SourceFiles#10=Src\iwdg.c
+SourceFiles#11=Src\main.cpp
+SourceFiles#12=Src\stm32f1xx_hal_msp.c
+SourceFiles#13=Src\stm32f1xx_it.c
+SourceFiles#14=Src\system_stm32f1xx.c
 SourceFolderListSize=1
-SourcePath#0=..\Core\Src
+SourcePath#0=Src
 SourceFiles=;
 

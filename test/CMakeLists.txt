@@ -42,9 +42,12 @@ add_executable(MIevM_Tests
     test_can_message_373.cpp
     test_can_message_374.cpp
     test_can_queue.cpp
+    test_utility.cpp
     ../Src/VoltageByte.cpp
     ../Src/CanMessage373.cpp
     ../Src/CanMessage374.cpp
+    ../Src/App.cpp
+    ../Src/utility.c
 )
 
 # Link against CppUTest

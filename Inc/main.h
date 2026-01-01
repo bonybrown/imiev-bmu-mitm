@@ -24,11 +24,16 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif
+#endif 
 
+/* For some reason, including stm32f105xc.h does not actually define STM32F105xC 
+  which is needed for some structure definitions for the clock configurations.
+  We define it here. */
+#ifndef STM32F105xC
+#define STM32F105xC
+#endif
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f105xc.h"
-//#include "stm32f1xx_hal.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -42,10 +47,6 @@ extern "C" {
 
 /* Exported constants --------------------------------------------------------*/
 /* USER CODE BEGIN EC */
-
-#define STM32_UUID ((char *)0x1FFFF7E8u)
-extern const uint32_t au32_lock[];
-extern uint32_t au32_UID[3]; 
 
 /* USER CODE END EC */
 

@@ -27,8 +27,8 @@ extern "C" {
 
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
-#include "can_types.h"
 #include <stm32f1xx_hal.h>
+#include <stm32f1xx_hal_can.h>
 
 /* USER CODE BEGIN Includes */
 
@@ -47,13 +47,8 @@ void MX_CAN2_Init(void);
 
 /* USER CODE BEGIN Prototypes */
 
-#define CAN_QUEUE  16
-
-#define MYCAN1     0
-#define MYCAN2     1
-
-#define CAN_TX     0
-#define CAN_RX     1
+// Error_Handler implementation is in main.cpp
+extern void Error_Handler(void);
 
 /* USER CODE END Private defines */
 
@@ -62,33 +57,10 @@ void MX_CAN2_Init(void);
 
 /* USER CODE BEGIN Prototypes */
 
-
-typedef enum
-{
-    CQ_OK,
-    CQ_FULL,
-    CQ_EMPTY,
-    CQ_IGNORED
-} CQ_STATUS;
-
-typedef struct
-{
-    uint8_t rec;
-    uint8_t trans;
-    uint8_t lastErrorCode;
-    uint8_t boff;
-    uint8_t passive;
-    uint8_t errorFlag;    
-}MYCAN_Errors;
-
-CQ_STATUS PushCan( uint8_t canNum, uint8_t TxRx, CAN_FRAME *frame );
-CQ_STATUS PopCan( uint8_t canNum, uint8_t TxRx, CAN_FRAME *frame );
-uint8_t LenCan( uint8_t canNum, uint8_t TxRx );
-void sendCan( uint8_t channel );
-void HAL_CAN_RxFIFO0MsgPendingCallback1( CAN_HandleTypeDef *canChan );
-void HAL_CAN_RxFIFO1MsgPendingCallback1( CAN_HandleTypeDef *canChan );
-void HAL_CAN_RxFIFO0MsgPendingCallback2( CAN_HandleTypeDef *canChan );
-void HAL_CAN_RxFIFO1MsgPendingCallback2( CAN_HandleTypeDef *canChan );
+/**
+ * @brief Configure CAN filters for the specified CAN handle
+ * @param canHandle Pointer to the CAN handle (hcan1 or hcan2)
+ */
 void AddCANFilters(CAN_HandleTypeDef* canHandle);
 
 

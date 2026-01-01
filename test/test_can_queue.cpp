@@ -285,7 +285,7 @@ TEST(CanQueue_DataIntegrity, FullFrameData)
     frame.dlc = 8;
     frame.ide = 0;
     frame.rtr = 0;
-    frame.pad = 0;
+    frame.tx_channel = 0;
     for (int i = 0; i < 8; i++) {
         frame.data[i] = i * 10;
     }
@@ -299,6 +299,7 @@ TEST(CanQueue_DataIntegrity, FullFrameData)
     LONGS_EQUAL(8, popped.dlc);
     LONGS_EQUAL(0, popped.ide);
     LONGS_EQUAL(0, popped.rtr);
+    LONGS_EQUAL(0, popped.tx_channel);
     
     for (int i = 0; i < 8; i++) {
         LONGS_EQUAL(i * 10, popped.data[i]);
