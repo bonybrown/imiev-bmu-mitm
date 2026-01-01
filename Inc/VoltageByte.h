@@ -95,18 +95,6 @@ public:
     static VoltageByte getMaxVoltage();
     static VoltageByte getMinVoltage();
 
-    /**
-     * @brief Calculate State of Charge (SoC2) from voltage byte
-     * @return State of Charge as percentage (0.0 to 100.0)
-     *
-     * This method implements the same voltage-to-SoC lookup table as storeSoC2()
-     * function in can-bridge-firmware.c. It uses piecewise linear interpolation
-     * to convert battery cell voltage to state of charge percentage.
-     *
-     * The function clamps the result to [0, 100] range.
-     */
-    float toSoC2() const;
-    
     // Comparison operators
     constexpr bool operator==(VoltageByte other) const { 
         return value_ == other.value_; 

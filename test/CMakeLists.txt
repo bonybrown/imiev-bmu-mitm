@@ -38,6 +38,8 @@ include_directories(
 # Test executable
 add_executable(MIevM_Tests
     test_main.cpp
+    test_app.cpp
+    test_battery_model.cpp
     test_voltage_byte.cpp
     test_can_message_373.cpp
     test_can_message_374.cpp
@@ -48,6 +50,7 @@ add_executable(MIevM_Tests
     ../Src/CanMessage374.cpp
     ../Src/App.cpp
     ../Src/utility.c
+    ../Src/BatteryModel.cpp
 )
 
 # Link against CppUTest
