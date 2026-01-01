@@ -20,6 +20,7 @@
  */
 class BatteryModel {
 public:
+    static const int MILLISECONDS_PER_HOUR = 3600000; ///< Number of milliseconds in one hour
     /**
      * @brief Constructor
      * @param capacity Battery capacity in amp-hours

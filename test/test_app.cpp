@@ -225,7 +225,7 @@ TEST(App_CanMsgReceived, Message373_updates_model)
 
     // Call canMsgReceived
     VoltageByte expectedVoltage = VoltageByte::fromVoltage(4.10f);
-    mock().expectOneCall("update").onObject(batteryModel).withParameter("cellMinVoltage", expectedVoltage.get()).withParameter("packCurrent", 10.0f).withParameter("deltaTMs", 100);
+    mock().expectOneCall("update").onObject(batteryModel).withParameter("cellMinVoltage", expectedVoltage.get()).withParameter("packCurrent", 10.0f).withParameter("deltaTMs", 10);
     app->canMsgReceived(frame);
     mock().checkExpectations();
 

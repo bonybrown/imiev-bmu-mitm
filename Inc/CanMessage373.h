@@ -27,6 +27,7 @@
  */
 class CanMessage373 {
 public:
+    static const uint32_t RECURRANCE_MS = 10; ///< Message recurrence interval in milliseconds
     static const uint16_t MESSAGE_ID = 0x373;
     
     /**

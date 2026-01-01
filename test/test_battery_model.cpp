@@ -237,6 +237,23 @@ TEST(BatteryModel_CoulombCounting, ChargingIncreasesCapacity)
     DOUBLES_EQUAL(initialAh + 20.0f, finalAh, 0.1f);
 }
 
+TEST(BatteryModel_CoulombCounting, ChargingIncreasesCapacityOneSecondIntervals)
+{
+    float initialAh = model->getRemainingAh1();
+
+    // Charge at 20A for 1 hour (3600 updates of 1 second each)
+    VoltageByte voltage = VoltageByte::fromVoltage(3.90f);
+    for (int i = 0; i < 3600; i++)
+    {
+        model->update(voltage, 20.0f, 1000);
+    }
+
+    float finalAh = model->getRemainingAh1();
+
+    // Should have charged approximately 20A * 1 hour = 20 Ah
+    DOUBLES_EQUAL(initialAh + 20.0f, finalAh, 0.01f);
+}
+
 TEST(BatteryModel_CoulombCounting, ClampsToMaxCapacity)
 {
     // Charge at high current to exceed capacity

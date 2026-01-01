@@ -24,7 +24,7 @@ void App::canMsgReceived(const CAN_FRAME &frame)
         CanMessage373 rxMsg(&frame);
         VoltageByte cellMin = rxMsg.getCellMinVoltage();
         float packCurrent = rxMsg.getPackCurrent();
-        m_batteryModel->update(cellMin, packCurrent, 100); // deltaTMs = 100ms
+        m_batteryModel->update(cellMin, packCurrent, CanMessage373::RECURRANCE_MS);
     }
 
     // Modify message 0x374 with updated SoC values

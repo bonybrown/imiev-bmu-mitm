@@ -46,8 +46,7 @@ void BatteryModel::update(VoltageByte cellMinVoltage, float packCurrent, uint32_
     }
 
     // Calculate amp-hours in/out during this update period
-    float Ah = (packCurrent * deltaTMs) / 3600000.0f; // Convert A*ms to Ah
-
+    float Ah = (packCurrent * deltaTMs) / (static_cast<float>(MILLISECONDS_PER_HOUR)); // Convert A*ms to Ah
     // Update both remaining capacity estimates
     m_remAh1 += Ah;
     m_remAh2 += Ah;
