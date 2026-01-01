@@ -101,7 +101,7 @@ TEST(App_CanMsgReceived, MessageAddedToTxQueue_Channel1To0)
     CAN_FRAME rxFrame;
     rxFrame.ID = 0x456;
     rxFrame.dlc = 5;
-    rxFrame.ide = 1;
+    rxFrame.ide = 0;
     rxFrame.rtr = 0;
     rxFrame.rx_channel = 1;
     rxFrame.data[0] = 0xAA;
@@ -146,7 +146,7 @@ TEST(App_CanMsgReceived, Message373_not_modified)
     CAN_FRAME rxFrame;
     rxFrame.ID = 0x373;
     rxFrame.dlc = 8;
-    rxFrame.ide = 1;
+    rxFrame.ide = 0;
     rxFrame.rtr = 0;
     rxFrame.rx_channel = 1;
     rxFrame.data[0] = 0xAA;
@@ -388,3 +388,83 @@ TEST(App_CanMsgReceived, Message374_data_matches_battery_model)
     DOUBLES_EQUAL(rxMsg.getCellMaxTemperature(), txMsg.getCellMaxTemperature(), 0.01);
     DOUBLES_EQUAL(rxMsg.getCellMinTemperature(), txMsg.getCellMinTemperature(), 0.01);
 }
+
+TEST(App_CanMsgReceived, RealWorldData)
+{
+    // data from real-world capture of message 0x373 on channel 1
+    CAN_FRAME rxFrame;
+    rxFrame.ID = 0x373;
+    rxFrame.dlc = 8;
+    rxFrame.ide = 0;
+    rxFrame.rtr = 0;
+    rxFrame.rx_channel = 1;
+    rxFrame.data[0] = 0xc8;
+    rxFrame.data[1] = 0xc7;
+    rxFrame.data[2] = 0x7f;
+    rxFrame.data[3] = 0xb9;
+    rxFrame.data[4] = 0x0e;
+    rxFrame.data[5] = 0x14;
+    rxFrame.data[6] = 0x00;
+    rxFrame.data[7] = 0x06;
+
+    // Verify queue is empty
+    CHECK(txQueue->isEmpty());
+
+    // Expect the battery model update to be called (0x373 triggers it)
+    mock().ignoreOtherCalls();
+
+    // Call canMsgReceived
+    for(int i = 0; i < 100; i++){
+        app->canMsgReceived(rxFrame);
+        txQueue->pop(nullptr); // discard tx message
+    }
+    CHECK(batteryModel->isInitialized());
+    LONGS_EQUAL(98, batteryModel->getSoC1());
+    LONGS_EQUAL(98, batteryModel->getSoC2());
+
+    CAN_FRAME msg374;
+    msg374.ID = 0x374;
+    msg374.dlc = 8;
+    msg374.ide = 0;
+    msg374.rtr = 0;
+    msg374.rx_channel = 1;
+    msg374.data[0] = 0x01;
+    msg374.data[1] = 0x02;
+    msg374.data[2] = 0x03;
+    msg374.data[3] = 0x04;
+    msg374.data[4] = 0x05;
+    msg374.data[5] = 0x06;
+    msg374.data[6] = 0x07;
+    msg374.data[7] = 0x08;
+
+    // Call canMsgReceived
+    app->canMsgReceived(msg374);
+    
+    // Verify message was added to tx queue
+    CHECK_FALSE(txQueue->isEmpty());
+    LONGS_EQUAL(1, txQueue->length());
+
+    // Get the message from the queue
+    CAN_FRAME txFrame;
+    CHECK(txQueue->pop(&txFrame));
+
+    // Verify all fields are the same except tx_channel
+    LONGS_EQUAL(msg374.ID, txFrame.ID);
+    LONGS_EQUAL(msg374.dlc, txFrame.dlc);
+    LONGS_EQUAL(msg374.ide, txFrame.ide);
+    LONGS_EQUAL(msg374.rtr, txFrame.rtr);
+
+    // Verify tx_channel is opposite of rx_channel
+    LONGS_EQUAL(0, txFrame.tx_channel);
+
+    CHECK(msg374.data[0] == 0xd0 ); // soc1 = 98
+    CHECK(msg374.data[1] == 0xd0 ); // soc2 = 98
+    CHECK(msg374.data[2] == 0x03 ); // data unchanged
+    CHECK(msg374.data[3] == 0x04 ); // data unchanged
+    CHECK(msg374.data[4] == 0x05 ); // max temp unchanged
+    CHECK(msg374.data[5] == 0x06 ); // min temp unchanged
+    CHECK(msg374.data[6] == 0xba ); // new capacity
+    CHECK(msg374.data[7] == 0x08 ); // data unchanged
+
+}
+

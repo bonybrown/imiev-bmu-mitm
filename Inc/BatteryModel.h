@@ -74,6 +74,12 @@ public:
      * @return true if initialized, false otherwise
      */
     bool isInitialized() const;
+
+    /**
+     * @brief Get valid data counter
+     * @return Number of valid data frames received during initialization
+     */
+    uint8_t getValidDataCounter() const { return m_validDataCounter; }
     
     /**
      * @brief Reset the model (e.g., after power cycle)

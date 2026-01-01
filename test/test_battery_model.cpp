@@ -154,6 +154,32 @@ TEST(BatteryModel_Initialization, InitializesFromVoltage)
     DOUBLES_EQUAL(expectedSoC, model->getSoC2(), 1.0f);
 }
 
+TEST(BatteryModel_Initialization, DoesNotInitialiseWithOutOfRangeVoltage)
+{
+    VoltageByte voltage = VoltageByte::fromVoltage(2.20f); // Below minimum 2.75V
+
+    // Perform 20 updates to initialize
+    for (int i = 0; i < 20; i++)
+    {
+        model->update(voltage, 0.0f, 10);
+    }
+    
+    // Model should still not be initialized. Data is out of range.
+    CHECK(!model->isInitialized());
+
+    voltage = VoltageByte::fromVoltage(4.00f); // Valid voltage
+    // Perform 20 updates to initialize
+    for (int i = 0; i < 20; i++)
+    {
+        model->update(voltage, 0.0f, 10);
+    }
+
+    // SoC should be initialized from voltage
+    float expectedSoC = BatteryModel::voltageToSoC2(voltage);
+    DOUBLES_EQUAL(expectedSoC, model->getSoC1(), 1.0f);
+    DOUBLES_EQUAL(expectedSoC, model->getSoC2(), 1.0f);
+}
+
 TEST_GROUP(BatteryModel_CoulombCounting)
 {
     BatteryModel *model;

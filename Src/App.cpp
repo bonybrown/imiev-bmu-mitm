@@ -83,13 +83,13 @@ void App::sendHeartbeat()
     heartbeat.data[1] = (m_seconds >> 16) & 0xFF;
     heartbeat.data[2] = (m_seconds >> 8) & 0xFF;
     heartbeat.data[3] = m_seconds & 0xFF;
-    heartbeat.data[4] = 0; // Reserved
-    heartbeat.data[5] = 0; // Reserved
-    heartbeat.data[6] = 0; // Reserved
-    heartbeat.data[7] = 0; // Reserved
+    heartbeat.data[4] = m_batteryModel->isInitialized(); // Reserved
+    heartbeat.data[5] = m_batteryModel->getRemainingAh1(); // Reserved
+    heartbeat.data[6] = m_batteryModel->getRemainingAh2(); // Reserved
+    heartbeat.data[7] = m_batteryModel->getValidDataCounter(); // Reserved
 
     // Queue for transmission
-    // m_txQueue->push(heartbeat);
+    m_txQueue->push(heartbeat);
 
     heartbeat.tx_channel = 1;
     heartbeat.ID = 0x721; // Example heartbeat ID for second channel

@@ -323,7 +323,7 @@ TEST(CanQueue_DataIntegrity, ExtendedID)
     CAN_FRAME frame;
     frame.ID = 0x1FFFFFFF; // 29-bit extended ID
     frame.dlc = 4;
-    frame.ide = 1;
+    frame.ide = 4;
     frame.rtr = 0;
     frame.data[0] = 0xAA;
     frame.data[1] = 0xBB;
@@ -337,7 +337,7 @@ TEST(CanQueue_DataIntegrity, ExtendedID)
 
     LONGS_EQUAL(0x1FFFFFFF, popped.ID);
     LONGS_EQUAL(4, popped.dlc);
-    LONGS_EQUAL(1, popped.ide);
+    LONGS_EQUAL(4, popped.ide);
     LONGS_EQUAL(0xAA, popped.data[0]);
     LONGS_EQUAL(0xBB, popped.data[1]);
     LONGS_EQUAL(0xCC, popped.data[2]);

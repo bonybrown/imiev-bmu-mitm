@@ -24,13 +24,13 @@ BatteryModel::BatteryModel(float capacity)
 void BatteryModel::update(VoltageByte cellMinVoltage, float packCurrent, uint32_t deltaTMs)
 {
     // Only update vMin if value is within valid range
-    if (cellMinVoltage >= VoltageByte::getMinVoltage() &&
-        cellMinVoltage <= VoltageByte::getMaxVoltage())
+    if (cellMinVoltage < VoltageByte::getMinVoltage() ||
+        cellMinVoltage > VoltageByte::getMaxVoltage())
     {
-        m_vMin = cellMinVoltage;
+        return; // Ignore invalid voltage readings
     }
-
     // Initialize on first valid data
+    m_vMin = cellMinVoltage;
     if (!m_initialized)
     {
         m_validDataCounter++;
