@@ -7,6 +7,7 @@ This directory contains unit tests for the MIevM CAN bridge firmware.
 - CMake 3.14 or higher
 - GCC compiler (native, not ARM cross-compiler)
 - CppUTest (included as local source in `/cpputest`)
+- `lcov` for generating test coverage report with the `--coverage` option.
 
 ## Building and Running Tests
 
@@ -35,21 +36,10 @@ make test            # Build and run tests
 make test-clean      # Clean test build directory
 ```
 
-### Manual Build
-
-```bash
-cd test
-mkdir -p build
-cd build
-cmake ..
-make
-./MIevM_Tests
-```
-
 ## Test Structure
 
 - `test_main.cpp` - Test runner entry point
-- `test_can_bridge.cpp` - Unit tests for CAN bridge functions
+- `test_[module_name].cpp` - Unit tests for `[module_name]`
 
 ## Writing New Tests
 
@@ -95,31 +85,9 @@ The coverage report shows code coverage **only for your project source files**, 
 - CppUTest library code
 - System headers
 
-Currently, the example tests use `test_functions.c` as a demonstration. To get coverage of your actual firmware:
-
-1. **Add your source files to the test build** in `test/CMakeLists.txt`:
-   ```cmake
-   add_executable(MIevM_Tests
-       test_main.cpp
-       test_can_bridge.cpp
-       test_functions.c
-       # Add your firmware source files here:
-       # ../Src/can-bridge-firmware.c
-       # ../Src/can.c
-   )
-   ```
-
-2. **Mock hardware dependencies** (GPIO, CAN peripherals, etc.) or use conditional compilation to replace hardware calls with test stubs.
-
-3. **Write tests** that exercise your actual firmware functions.
-
-### Interpreting Coverage Results
-
-- **Line coverage**: Percentage of code lines executed during tests
-- **Function coverage**: Percentage of functions called during tests
-- **Branch coverage**: Percentage of conditional branches tested (if available)
-
-Aim for high coverage (>80%) on critical business logic, though 100% coverage doesn't guarantee bug-free code.
+Because `main.cpp` is mainly concerned with hardware initialisation
+and passing CAN frames between the hardware and the `App` instance,
+there are no tests for that code. It is kept intentionally simple - _Change with care!_
 
 ## CppUTest Documentation
 

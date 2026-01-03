@@ -1,49 +1,141 @@
-disclamer.
+# MIevM - Battery Management System CAN Bridge
 
- FSI code from original one PIEV MIM Imiev CATL93 upgrade., platform Arduino Due + CAN shield 
- the actual structure of this project comes from "Dala the great" , mod for LEAF battery swap 
+A CAN bus bridge firmware for Mitsubishi i-MiEV vehicles to enable battery pack upgrades. This project translates CAN messages between the vehicle and aftermarket battery packs (originally developed for CATL 93Ah NMC cells).
 
- Board used for MIevM, is a "MB CAN STM32" or "MB Filter", also known to fool odometer (for bad reason 99% of time) , it is very cheap and affordable.
- Take care to buy only the stm32f105RBT06. PCB is genarally blue.
- 
- FSI is my trigram , my first name is Florent , I add "FSI" each time I modify something to keep track of the mod.
-until Version revision is V0.x , it is NOT fully tested (not easy to perform!) actually the car is drivable and range reported
-is 254Km (in theory I don't swapped my pack yet), and that's all! Don't start mass prod right now!
+## Target Hardware
 
- feal free to optimize, change, motify  and never forget to notify 
- 
- if you perform a swap as B2C with this code as a starting base ... we , the community, ask you to also share your experience (data, streams, tips tricks code method)
- 
- if you are earning money by doing so... without sharing you're a f**g b***d  ..... 
+**Board**: "MB CAN STM32" or "MB Filter" (commonly sold with blue PCB) from
+vendors on AliExpress.
+- **MCU**: STM32F105RBT6 (Connectivity Line with dual CAN peripherals)
+- **CAN Bus**: Dual CAN transceivers (CAN1 and CAN2)
+
+## Acknowledgements
+
+This project is a C++ rewrite of the original C implementation:
+
+- **Original Project**: [iso14000/MIevM](https://github.com/iso14000/MIevM/tree/main) by FSI (Florent)
+- **Based on**: PIEV MIM (Mitsubishi i-MiEV CATL93 upgrade) for Arduino Due + CAN shield
+
+This rewrite adds comprehensive unit testing, improved type safety, and modern C++ software engineering practices while maintaining functional compatibility with the original.
+
+It also adds a build system that relies only on standard command-line build tools -  cmake, make, gcc, stlink-tools
+
+## Features
+
+- **Battery Model**: Dual state-of-charge (SoC) estimation
+  - **SoC1**: Coulomb counting (charge integration)
+  - **SoC2**: Voltage-based estimation with calibration during rest periods
+- **Heartbeat Transmission**: Periodic status message (on PID 0x720)
+  - Includes software version and uptime counter, more diagnositcs to follow. 
+- **Comprehensive Unit Testing**
+
+### Current Limitations (v1.0)
+- **No sleep mode** implemented
+- **No regenerative braking control** (low-temperature protection)
+
+## Heartbeat Message (0x720)
+
+The firmware transmits a heartbeat message on both CAN buses every second:
+
+| Byte | Content | Description |
+|------|---------|-------------|
+| 0 | Major Version | Software major version (e.g., 1) |
+| 1 | Minor Version | Software minor version (e.g., 0) |
+| 2 | Reserved | Reserved for future use (0x00) |
+| 3 | Reserved | Reserved for future use (0x00) |
+| 4-7 | Uptime | System uptime in seconds (uint32_t, big-endian) |
+
+Example: `01 00 00 00 00 00 0E 10` = Version 1.0, uptime 3600 seconds (1 hour)
+
+## Quick Start
+
+### Prerequisites
+
+- Your host toolchain for building and running the unit tests (`build-essential`, includes `g++` and `make`)
+- CMake 3.14 or higher (`cmake`)
+- ARM GCC toolchain for building the target firmware (`arm-none-eabi-gcc`)
+- Optional:
+	- ST-Link programmer for flashing (`stlink-tools`)
+	- For generating test coverage reports (`lcov`)
+
+### Building the Firmware
+
+```bash
+# Build firmware (using build script)
+./build.sh
+
+# Or use Make targets
+make              # Build firmware (release mode)
+make tests        # Build and run unit tests
+make help         # Show all available Make targets
+```
+
+#### Available Make Targets
+
+```
+make                  - Build firmware (release mode)
+make firmware         - Build firmware (release mode)
+make firmware-debug   - Build firmware (debug mode)
+make tests            - Build and run unit tests
+make tests-verbose    - Run tests with verbose output
+make tests-coverage   - Run tests with coverage report
+make clean            - Clean firmware build
+make clean-tests      - Clean test build
+make clean-all        - Clean all builds
+make flash            - Flash firmware to STM32 using `st-flash` utility
+make help             - Show this help message
+```
+
+Output firmware binary: `build/MIevM.bin`
+
+Output firmware srec file: `build/MIevM.srec`
+
+### Running Tests
+
+```bash
+# Run all unit tests
+./test.sh
+
+# Run with verbose output
+./test.sh -v
+
+# Generate coverage report
+./test.sh --coverage
+```
+
+For detailed test information, see [test/README.md](test/README.md).
+
+For more information about the unit test framework, see [cpputest/README.md](cpputest/README.md).
 
 
-V0.1 first test in the car OK => range is 253Km on combination meter , can be in "ready mode" , and can drive.
+### Understanding the Code
 
-V0.2 cleanup from Dala's software (Leaf battery pack upgrade) and SoCx clamping [0..100%] ; 
-V0.3 now MIevM is connected on P12V (permanent 12V) , so sleep mode is activated after a delay (20s for instance)
-V0.4 added a NMC under temperature recharge inhibition. tested on bench only!
-				when temp goes below 5°C Vmax is puched to 4.2V, main effect is to forbid regular charging and regeneration
-		, changed "char" to "uint8_t" for clarity. Tested on bench, not "in car" ... we are almost burning in Toulouse :-\
+- **Firmware Architecture**: See [Src/README.md](Src/README.md) for main program structure
 
 
-quickly validated on my car, report correctly Soc vs Voltage, range decrease while driving, 
+## SOC2 Voltage→SOC Transfer Function
 
-
-
->>DONE : TODO take care of energy by activating the sleep feature.
-
-TODO add a busbutton to force SoC2 vs voltage evaluation. (or anything else)
-
-TODO => add a Peukert law
-
-TODO => add a compilation switch to activate Voltage filter (CMU failure filter)
-
-TODO => not a small piece , add a RS232 to monitor / configure features.... 
-
-
-![2356-f2dc6ea27cf599fa2192ae4c08f08950](https://github.com/user-attachments/assets/1103d7ac-ac8a-44a7-8370-22248550f207)
-
-
-## SOC2 Voltage->SOC transfer function
 Implementation in `BatteryModel::voltageToSoC2()`
-![transfer function](soc2_transfer_function.png)
+
+![transfer function](documentation/soc2_transfer_function.png)
+
+Refer to the [documentation](documentation/) directory for how to recreate this plot if needed.
+
+## Project Structure
+
+| Directory | Description |
+|-----------|-------------|
+| **Src/** | Main firmware source code (C++, App, BatteryModel, CAN handlers) |
+| **Inc/** | Header files (interfaces, CAN types, HAL configuration) |
+| **test/** | Unit tests using CppUTest framework |
+| **Drivers/** | STM32 HAL drivers and CMSIS headers |
+| **build/** | Build output directory (firmware binaries, object files) |
+| **cpputest/** | CppUTest framework source (testing dependency) |
+| **documentation/** | Transfer function plots and generation tools |
+| **.vscode/** | VS Code configuration (build tasks, debugger setup) |
+
+## Build Artifacts
+
+- `build/MIevM.bin` - Flashable firmware binary
+- `build/MIevM.srec` - S-record format firmware
+- `build/MIevM.lst` - Assembly listing with symbols

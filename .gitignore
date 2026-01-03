@@ -1,3 +1,5 @@
 build/
 test/build/
 
+documentation/generate_soc2_transfer_function
+documentation/soc2_data.csv

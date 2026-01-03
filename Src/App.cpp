@@ -10,6 +10,7 @@
 #include <CanMessage373.h>
 #include <stdio.h>
 #include <CanMessage374.h>
+#include "version.h"
 /**
  * @brief Process received CAN messages
  */
@@ -73,25 +74,28 @@ void App::timeTickMs(uint32_t ms)
 void App::sendHeartbeat()
 {
     CAN_FRAME heartbeat;
-    heartbeat.ID = 0x720; // Example heartbeat ID
+    heartbeat.ID = 0x720; /// Heartbeat message ID, value chosen arbitrarily, but believed to be unused
     heartbeat.dlc = 8;
     heartbeat.ide = 0;
     heartbeat.rtr = 0;
     heartbeat.tx_channel = 0;
 
-    heartbeat.data[0] = (m_seconds >> 24) & 0xFF;
-    heartbeat.data[1] = (m_seconds >> 16) & 0xFF;
-    heartbeat.data[2] = (m_seconds >> 8) & 0xFF;
-    heartbeat.data[3] = m_seconds & 0xFF;
-    heartbeat.data[4] = m_batteryModel->isInitialized(); // Reserved
-    heartbeat.data[5] = m_batteryModel->getRemainingAh1(); // Reserved
-    heartbeat.data[6] = m_batteryModel->getRemainingAh2(); // Reserved
-    heartbeat.data[7] = m_batteryModel->getValidDataCounter(); // Reserved
+    // Hearbeat data for ID 0x720
+    // Bytes 0-1 = major/minor version of the software (e.g., 1.0)
+    heartbeat.data[0] = ProjectVersion::MAJOR;
+    heartbeat.data[1] = ProjectVersion::MINOR;
+    // Byte 2 = reserved
+    heartbeat.data[2] = 0;
+    // Byte 3 = reserved
+    heartbeat.data[3] = 0;
+    // Bytes 4-7 = uptime in seconds (uint32_t)
+    heartbeat.data[4] = (m_seconds >> 24) & 0xFF;
+    heartbeat.data[5] = (m_seconds >> 16) & 0xFF;
+    heartbeat.data[6] = (m_seconds >> 8) & 0xFF;
+    heartbeat.data[7] = m_seconds & 0xFF;
 
-    // Queue for transmission
+    // Queue for transmission on both channels
     m_txQueue->push(heartbeat);
-
     heartbeat.tx_channel = 1;
-    heartbeat.ID = 0x721; // Example heartbeat ID for second channel
     m_txQueue->push(heartbeat);
 }
