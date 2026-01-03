@@ -51,26 +51,17 @@ Example: `01 00 00 00 00 00 0E 10` = Version 1.0, uptime 3600 seconds (1 hour)
 
 ### Prerequisites
 
-- Your host toolchain for building and running the unit tests (`build-essential`, includes `g++` and `make`)
+- Your host toolchain for building and running the unit tests (`gcc` and `make`)
 - CMake 3.14 or higher (`cmake`)
 - ARM GCC toolchain for building the target firmware (`arm-none-eabi-gcc`)
 - Optional:
 	- ST-Link programmer for flashing (`stlink-tools`)
 	- For generating test coverage reports (`lcov`)
 
-### Building the Firmware
+Consult [CMAKE_BUILD.md](CMAKE_BUILD.md) for how to get
+started on Linux / MacOS / Windows platforms.
 
-```bash
-# Build firmware (using build script)
-./build.sh
-
-# Or use Make targets
-make              # Build firmware (release mode)
-make tests        # Build and run unit tests
-make help         # Show all available Make targets
-```
-
-#### Available Make Targets
+### Available Make Targets
 
 ```
 make                  - Build firmware (release mode)
@@ -84,6 +75,16 @@ make clean-tests      - Clean test build
 make clean-all        - Clean all builds
 make flash            - Flash firmware to STM32 using `st-flash` utility
 make help             - Show this help message
+```
+
+### Building the Firmware
+
+```bash
+# Build firmware (using make)
+make                       # Build firmware (release mode)
+# Build firmware (using build script)
+./build.sh -r              # Build firmware (release mode)
+./build.sh				   # Build firmware (debug mode)
 ```
 
 Output firmware binary: `build/MIevM.bin`
@@ -107,10 +108,32 @@ For detailed test information, see [test/README.md](test/README.md).
 
 For more information about the unit test framework, see [cpputest/README.md](cpputest/README.md).
 
+## Project Structure
+
+| Directory | Description |
+|-----------|-------------|
+| **Src/** | Main firmware source code (C++, App, BatteryModel, CAN handlers) |
+| **Inc/** | Header files (interfaces, CAN types, HAL configuration) |
+| **test/** | Unit tests for the project using CppUTest framework |
+| **Drivers/** | STM32 HAL drivers and CMSIS headers |
+| **cpputest/** | CppUTest framework source (testing dependency) |
+| **documentation/** | Transfer function plots and generation tools |
+| **build/** | Build output directory (not committed to the repository) |
+| **.vscode/** | VS Code configuration (build tasks, debugger setup) |
 
 ### Understanding the Code
 
 - **Firmware Architecture**: See [Src/README.md](Src/README.md) for main program structure
+- **Build System Details**: See [CMAKE_BUILD.md](CMAKE_BUILD.md) for CMake configuration and advanced build options
+
+
+
+## Build Artifacts
+
+- `build/MIevM.bin` - Flashable firmware binary
+- `build/MIevM.srec` - S-record format firmware
+- `build/MIevM.lst` - Assembly listing with symbols
+
 
 
 ## SOC2 Voltage→SOC Transfer Function
@@ -121,21 +144,3 @@ Implementation in `BatteryModel::voltageToSoC2()`
 
 Refer to the [documentation](documentation/) directory for how to recreate this plot if needed.
 
-## Project Structure
-
-| Directory | Description |
-|-----------|-------------|
-| **Src/** | Main firmware source code (C++, App, BatteryModel, CAN handlers) |
-| **Inc/** | Header files (interfaces, CAN types, HAL configuration) |
-| **test/** | Unit tests using CppUTest framework |
-| **Drivers/** | STM32 HAL drivers and CMSIS headers |
-| **build/** | Build output directory (firmware binaries, object files) |
-| **cpputest/** | CppUTest framework source (testing dependency) |
-| **documentation/** | Transfer function plots and generation tools |
-| **.vscode/** | VS Code configuration (build tasks, debugger setup) |
-
-## Build Artifacts
-
-- `build/MIevM.bin` - Flashable firmware binary
-- `build/MIevM.srec` - S-record format firmware
-- `build/MIevM.lst` - Assembly listing with symbols
