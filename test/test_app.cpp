@@ -25,6 +25,17 @@ public:
     }
 };
 
+void InitializeBatteryModel(MockBatteryModel* model)
+{
+    mock().expectNCalls(25, "update").onObject(model).withParameter("cellMinVoltage", VoltageByte::fromVoltage(4.0f).get()).withParameter("packCurrent", 1.0f).withParameter("deltaTMs", 100);
+    // Send multiple updates to initialize battery model
+    for (int i = 0; i < 25; i++)
+    {
+        model -> update(VoltageByte::fromVoltage(4.0f), 1.0f, 100); //100ms of 4.0 volts, 1A current
+    }
+
+}
+
 TEST_GROUP(App_CanMsgReceived)
 {
     CanQueue<QUEUE_CAPACITY> *txQueue;
@@ -271,9 +282,8 @@ TEST(App_CanMsgReceived, Message374_is_replaced)
 
     // Verify queue is empty
     CHECK(txQueue->isEmpty());
-
-    // Expect no calls to battery model update
-    mock().expectNoCall("update");
+    //ensure the battery model is initialized
+    InitializeBatteryModel(batteryModel);
 
     // Call canMsgReceived
     CAN_FRAME frameCopy = frame; // Make a copy to pass
@@ -468,3 +478,31 @@ TEST(App_CanMsgReceived, RealWorldData)
 
 }
 
+TEST(App_CanMsgReceived, Message374IsNotFowardedUnlessModelInitialized)
+{
+    CAN_FRAME frame;
+    frame.ID = 0x374;
+    frame.dlc = 8;
+    frame.ide = 0; // Standard ID
+    frame.rtr = 0; // Data frame
+    frame.rx_channel = 0;
+    CanMessage374 rxMsg(&frame);
+
+    // Verify queue is empty
+    CHECK(txQueue->isEmpty());
+    // Verify model is not initialized
+    CHECK_FALSE(batteryModel->isInitialized());
+
+    // Expect no calls to battery model update
+    mock().expectNoCall("update");
+
+    // Call canMsgReceived
+    app->canMsgReceived(frame);
+    mock().checkExpectations();
+
+    // Verify model is still not initialized
+    CHECK_FALSE(batteryModel->isInitialized());
+
+    // Verify message was NOT added to tx queue
+    CHECK(txQueue->isEmpty());
+}
