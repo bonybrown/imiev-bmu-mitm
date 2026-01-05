@@ -14,7 +14,7 @@ namespace ProjectVersion {
 /*
 Version History:
 - Version 1.0: Initial release, C++ version of https://github.com/iso14000/MIevM/tree/main, added unit tests and improved type safety.
-There is no sleep mode implemented, nor and regenerative braking control.
+There is no sleep mode implemented, nor any regenerative braking control.
 Added heartbeat message with uptime.
 
 - Version 1.1: Ensure SoC2 recalibration occurs every 60 seconds, not just once after rest.
