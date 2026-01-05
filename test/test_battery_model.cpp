@@ -163,7 +163,7 @@ TEST(BatteryModel_Initialization, DoesNotInitialiseWithOutOfRangeVoltage)
     {
         model->update(voltage, 0.0f, 10);
     }
-    
+
     // Model should still not be initialized. Data is out of range.
     CHECK(!model->isInitialized());
 
@@ -337,6 +337,47 @@ TEST(BatteryModel_VoltageCalibration, RecalibratesAfterRest)
 
     // Should be different from before rest
     CHECK(socAfterRest != socBeforeRest);
+}
+
+TEST(BatteryModel_VoltageCalibration, RecalibratesEvery60SecondsAtRest)
+{
+    // Simulate discharge to drift SoC2
+    VoltageByte voltage = VoltageByte::fromVoltage(3.70f);
+    for (int i = 0; i < 100; i++)
+    {
+        model->update(voltage, -50.0f, 100);
+    }
+
+    float socBeforeRest = model->getSoC2();
+
+    // Now let battery rest at higher voltage for > 60 seconds
+    VoltageByte restVoltage = VoltageByte::fromVoltage(3.90f);
+    for (int i = 0; i < 610; i++)
+    {                                          // 61 seconds
+        model->update(restVoltage, 0.5f, 100); // Very low current
+    }
+
+    float socAfterRest1 = model->getSoC2();
+    // Should be different from before rest, ie it recalibrated
+    CHECK(socAfterRest1 != socBeforeRest);
+
+    // Send one value at a different voltage
+    restVoltage = VoltageByte::fromVoltage(3.91f);
+    model->update(restVoltage, 0.0f, 100);
+    float socAfterSingleUpdate = model->getSoC2();
+    printf("SoC after single update: %f\n", socAfterSingleUpdate);
+    printf("SoC after rest 1: %f\n", socAfterRest1);
+    CHECK(socAfterSingleUpdate == socAfterRest1); // No recalibration yet
+
+    // Continue resting for another 60 seconds
+    restVoltage = VoltageByte::fromVoltage(3.92f);
+    for (int i = 0; i < 610; i++)
+    {                                          // 61 seconds
+        model->update(restVoltage, 0.0f, 100); // Very low current
+    }
+    float socAfterRest2 = model->getSoC2();
+    CHECK(socAfterRest2 != socAfterRest1);
+    CHECK(socAfterSingleUpdate != socAfterRest2);
 }
 
 TEST(BatteryModel_VoltageCalibration, NoRecalibrationWithHighCurrent)
