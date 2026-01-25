@@ -16,6 +16,7 @@
  */
 void App::canMsgReceived(const CAN_FRAME &frame)
 {
+    bool sendResponse = true;
     // copy the frame to modify if needed
     CAN_FRAME response = frame;
 
@@ -38,12 +39,17 @@ void App::canMsgReceived(const CAN_FRAME &frame)
         rxMsg.setSoC2(m_batteryModel->getSoC2());
         // Leave temperatures unchanged
         response = *(rxMsg.getFrame());
+        // Only send response if battery model is initialized
+        sendResponse = m_batteryModel->isInitialized();
     }
 
     // Send responses back on opposite channel they were received from
     response.tx_channel = frame.rx_channel ? 0 : 1;
-    // Push the response to the TxQueue
-    m_txQueue->push(response);
+    // Push the response to the TxQueue, if sending this frame
+    if (sendResponse)
+    {
+        m_txQueue->push(response);
+    }
 }
 
 /**

@@ -69,6 +69,7 @@ void BatteryModel::update(VoltageByte cellMinVoltage, float packCurrent, uint32_
     {
         float SoC2 = voltageToSoC2(m_vMin);
         m_remAh2 = (SoC2 * m_capacity) / 100.0f;
+        m_restTimeMs = 0; // Reset rest timer after recalibration
     }
     else
     {
