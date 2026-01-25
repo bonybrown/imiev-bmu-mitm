@@ -190,7 +190,7 @@ TEST(CanMessage374_TemperatureAccess, GetMaxTemp_ZeroDegrees)
     frame.data[4] = 50; // 50 - 50 = 0°C
     CanMessage374 msg(&frame);
 
-    float temp = msg.getCellMaxTemperature();
+    float temp = msg.getCellMaxTemperature().celsius();
     DOUBLES_EQUAL(0.0f, temp, 0.01f);
 }
 
@@ -199,7 +199,7 @@ TEST(CanMessage374_TemperatureAccess, GetMaxTemp_TwentyFiveDegrees)
     frame.data[4] = 75; // 75 - 50 = 25°C
     CanMessage374 msg(&frame);
 
-    float temp = msg.getCellMaxTemperature();
+    float temp = msg.getCellMaxTemperature().celsius();
     DOUBLES_EQUAL(25.0f, temp, 0.01f);
 }
 
@@ -208,7 +208,7 @@ TEST(CanMessage374_TemperatureAccess, GetMaxTemp_NegativeTen)
     frame.data[4] = 40; // 40 - 50 = -10°C
     CanMessage374 msg(&frame);
 
-    float temp = msg.getCellMaxTemperature();
+    float temp = msg.getCellMaxTemperature().celsius();
     DOUBLES_EQUAL(-10.0f, temp, 0.01f);
 }
 
@@ -217,7 +217,7 @@ TEST(CanMessage374_TemperatureAccess, GetMinTemp_ZeroDegrees)
     frame.data[5] = 50; // 50 - 50 = 0°C
     CanMessage374 msg(&frame);
 
-    float temp = msg.getCellMinTemperature();
+    float temp = msg.getCellMinTemperature().celsius();
     DOUBLES_EQUAL(0.0f, temp, 0.01f);
 }
 
@@ -226,7 +226,7 @@ TEST(CanMessage374_TemperatureAccess, GetMinTemp_FiveDegrees)
     frame.data[5] = 55; // 55 - 50 = 5°C
     CanMessage374 msg(&frame);
 
-    float temp = msg.getCellMinTemperature();
+    float temp = msg.getCellMinTemperature().celsius();
     DOUBLES_EQUAL(5.0f, temp, 0.01f);
 }
 
@@ -235,61 +235,61 @@ TEST(CanMessage374_TemperatureAccess, GetMinTemp_MinusFive)
     frame.data[5] = 45; // 45 - 50 = -5°C
     CanMessage374 msg(&frame);
 
-    float temp = msg.getCellMinTemperature();
+    float temp = msg.getCellMinTemperature().celsius();
     DOUBLES_EQUAL(-5.0f, temp, 0.01f);
 }
 
 TEST(CanMessage374_TemperatureAccess, SetMaxTemp_TwentyDegrees)
 {
     CanMessage374 msg(&frame);
-    msg.setCellMaxTemperature(20.0f);
+    msg.setCellMaxTemperature(TemperatureValue(20.0f));
 
     LONGS_EQUAL(70, frame.data[4]); // 20 + 50 = 70
-    DOUBLES_EQUAL(20.0f, msg.getCellMaxTemperature(), 0.5f);
+    DOUBLES_EQUAL(20.0f, msg.getCellMaxTemperature().celsius(), 0.5f);
 }
 
 TEST(CanMessage374_TemperatureAccess, SetMinTemp_FiveDegrees)
 {
     CanMessage374 msg(&frame);
-    msg.setCellMinTemperature(5.0f);
+    msg.setCellMinTemperature(TemperatureValue(5.0f));
 
     LONGS_EQUAL(55, frame.data[5]); // 5 + 50 = 55
-    DOUBLES_EQUAL(5.0f, msg.getCellMinTemperature(), 0.5f);
+    DOUBLES_EQUAL(5.0f, msg.getCellMinTemperature().celsius(), 0.5f);
 }
 
 TEST(CanMessage374_TemperatureAccess, SetTemp_NegativeValue)
 {
     CanMessage374 msg(&frame);
-    msg.setCellMaxTemperature(-10.0f);
+    msg.setCellMaxTemperature(TemperatureValue(-10.0f));
 
     LONGS_EQUAL(40, frame.data[4]); // -10 + 50 = 40
-    DOUBLES_EQUAL(-10.0f, msg.getCellMaxTemperature(), 0.5f);
+    DOUBLES_EQUAL(-10.0f, msg.getCellMaxTemperature().celsius(), 0.5f);
 }
 
 TEST(CanMessage374_TemperatureAccess, SetTemp_ClampLow)
 {
     CanMessage374 msg(&frame);
-    msg.setCellMinTemperature(-60.0f); // Would be -10, clamped to 0
+    msg.setCellMinTemperature(TemperatureValue(-60.0f)); // Would be -10, clamped to 0
 
     LONGS_EQUAL(0, frame.data[5]);
-    DOUBLES_EQUAL(-50.0f, msg.getCellMinTemperature(), 0.5f);
+    DOUBLES_EQUAL(-50.0f, msg.getCellMinTemperature().celsius(), 0.5f);
 }
 
 TEST(CanMessage374_TemperatureAccess, SetTemp_ClampHigh)
 {
     CanMessage374 msg(&frame);
-    msg.setCellMaxTemperature(250.0f); // Would be 300, clamped to 255
+    msg.setCellMaxTemperature(TemperatureValue(250.0f)); // Would be 300, clamped to 255
 
     LONGS_EQUAL(255, frame.data[4]);
-    DOUBLES_EQUAL(205.0f, msg.getCellMaxTemperature(), 0.5f);
+    DOUBLES_EQUAL(205.0f, msg.getCellMaxTemperature().celsius(), 0.5f);
 }
 
 TEST(CanMessage374_TemperatureAccess, RoundTripTemperature)
 {
     CanMessage374 msg(&frame);
-    msg.setCellMaxTemperature(37.5f);
+    msg.setCellMaxTemperature(TemperatureValue(37.5f));
 
-    float retrieved = msg.getCellMaxTemperature();
+    float retrieved = msg.getCellMaxTemperature().celsius();
     DOUBLES_EQUAL(37.5f, retrieved, 0.5f);
 }
 
@@ -466,8 +466,8 @@ TEST(CanMessage374_RealWorldScenarios, FullyChargedBattery)
 
     DOUBLES_EQUAL(100.0f, msg.getSoC1(), 0.5f);
     DOUBLES_EQUAL(100.0f, msg.getSoC2(), 0.5f);
-    DOUBLES_EQUAL(35.0f, msg.getCellMaxTemperature(), 0.5f);
-    DOUBLES_EQUAL(30.0f, msg.getCellMinTemperature(), 0.5f);
+    DOUBLES_EQUAL(35.0f, msg.getCellMaxTemperature().celsius(), 0.5f);
+    DOUBLES_EQUAL(30.0f, msg.getCellMinTemperature().celsius(), 0.5f);
     DOUBLES_EQUAL(93.0f, msg.getBatteryCapacity(), 0.5f);
 }
 
@@ -490,8 +490,8 @@ TEST(CanMessage374_RealWorldScenarios, HalfChargedBattery)
 
     DOUBLES_EQUAL(48.0f, msg.getSoC1(), 0.5f);
     DOUBLES_EQUAL(52.0f, msg.getSoC2(), 0.5f);
-    DOUBLES_EQUAL(22.0f, msg.getCellMaxTemperature(), 0.5f);
-    DOUBLES_EQUAL(20.0f, msg.getCellMinTemperature(), 0.5f);
+    DOUBLES_EQUAL(22.0f, msg.getCellMaxTemperature().celsius(), 0.5f);
+    DOUBLES_EQUAL(20.0f, msg.getCellMinTemperature().celsius(), 0.5f);
     DOUBLES_EQUAL(90.0f, msg.getBatteryCapacity(), 0.5f);
 }
 
@@ -514,8 +514,8 @@ TEST(CanMessage374_RealWorldScenarios, LowBatteryColdWeather)
 
     DOUBLES_EQUAL(15.0f, msg.getSoC1(), 0.5f);
     DOUBLES_EQUAL(12.0f, msg.getSoC2(), 0.5f);
-    DOUBLES_EQUAL(2.0f, msg.getCellMaxTemperature(), 0.5f);
-    DOUBLES_EQUAL(-3.0f, msg.getCellMinTemperature(), 0.5f);
+    DOUBLES_EQUAL(2.0f, msg.getCellMaxTemperature().celsius(), 0.5f);
+    DOUBLES_EQUAL(-3.0f, msg.getCellMinTemperature().celsius(), 0.5f);
     DOUBLES_EQUAL(88.0f, msg.getBatteryCapacity(), 0.5f);
 }
 
@@ -526,15 +526,15 @@ TEST(CanMessage374_RealWorldScenarios, BuildCompleteMessage)
 
     msg.setSoC1(75.5f);
     msg.setSoC2(73.0f);
-    msg.setCellMaxTemperature(28.0f);
-    msg.setCellMinTemperature(25.0f);
+    msg.setCellMaxTemperature(TemperatureValue(28.0f));
+    msg.setCellMinTemperature(TemperatureValue(25.0f));
     msg.setBatteryCapacity(92.0f);
 
     // Verify all values
     DOUBLES_EQUAL(75.5f, msg.getSoC1(), 0.5f);
     DOUBLES_EQUAL(73.0f, msg.getSoC2(), 0.5f);
-    DOUBLES_EQUAL(28.0f, msg.getCellMaxTemperature(), 0.5f);
-    DOUBLES_EQUAL(25.0f, msg.getCellMinTemperature(), 0.5f);
+    DOUBLES_EQUAL(28.0f, msg.getCellMaxTemperature().celsius(), 0.5f);
+    DOUBLES_EQUAL(25.0f, msg.getCellMinTemperature().celsius(), 0.5f);
     DOUBLES_EQUAL(92.0f, msg.getBatteryCapacity(), 0.5f);
 }
 
@@ -546,8 +546,8 @@ TEST(CanMessage374_RealWorldScenarios, TemperatureDelta)
 
     CanMessage374 msg(&frame);
 
-    float maxTemp = msg.getCellMaxTemperature();
-    float minTemp = msg.getCellMinTemperature();
+    float maxTemp = msg.getCellMaxTemperature().celsius();
+    float minTemp = msg.getCellMinTemperature().celsius();
     float delta = maxTemp - minTemp;
 
     DOUBLES_EQUAL(10.0f, delta, 0.5f);

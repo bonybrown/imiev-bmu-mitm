@@ -25,15 +25,20 @@ It also adds a build system that relies only on standard command-line build tool
 - **Battery Model**: Dual state-of-charge (SoC) estimation
   - **SoC1**: Coulomb counting (charge integration)
   - **SoC2**: Voltage-based estimation with calibration during rest periods
-- **Heartbeat Transmission**: Periodic status message (on PID 0x720)
-  - Includes software version and uptime counter, more diagnositcs to follow. 
+- **Diagnostic Functions**:
+  - Periodic status message (on PID 0x720), including
+    - software version
+	- actual cell min and max temperatures
+	- uptime counter
+  - Diagnostic command function on PID 0x721
+    - allows overriding the cell min/max temperatures reported from the BMU to the EV-ECU 
 - **Comprehensive Unit Testing**
 
 ### Current Limitations (v1.0)
 - **No sleep mode** implemented
 - **No regenerative braking control** (low-temperature protection)
 
-## Heartbeat Message (0x720)
+## Diagnostic Message (0x720)
 
 The firmware transmits a heartbeat message on both CAN buses every second:
 
@@ -41,11 +46,23 @@ The firmware transmits a heartbeat message on both CAN buses every second:
 |------|---------|-------------|
 | 0 | Major Version | Software major version (e.g., 1) |
 | 1 | Minor Version | Software minor version (e.g., 0) |
-| 2 | Reserved | Reserved for future use (0x00) |
-| 3 | Reserved | Reserved for future use (0x00) |
+| 2 | Actual Cell Minimum Temperature | °C + 50 |
+| 3 | Actual Cell Maximum Temperature | °C + 50 |
 | 4-7 | Uptime | System uptime in seconds (uint32_t, big-endian) |
 
-Example: `01 00 00 00 00 00 0E 10` = Version 1.0, uptime 3600 seconds (1 hour)
+Example: `02 00 42 44 00 00 0E 10` = Version 2.0, 16 min, 18 max cell temps, uptime 3600 seconds (1 hour)
+
+## Diagnostic Command (0x721)
+
+The firmware responds to a diagnostic command message on PID 0x721
+
+The first byte [0] of the message is the command id. The remaining bytes are parameters to the command
+
+
+| Command ID | Description | Parameters | Example |
+|------|---------|-------|------|
+| 1 | **Override Cell min/max temperatures for 10 seconds**<br/>Sends overridden values to the EV-ECU, with the real cell temperatures reported in the Diagnostic Message (0x720). Temperatures on the CAN bus are (°C + 50) . Overrides are inhibited under these conditions:<br/>* If cell max temp is under 10°C → the override max temp must be less than 10°C higher the actual max temp<br/> * If the cell max temp is over 25°C → override max must be higher than 25°C<br/>When the actual cell temp is between 10°C and 25°C the override temperature may be set to any value. | [1] min temp<br>[2] max temp | `01 46 47` set min=20°C, max=21°C|
+
 
 ## Quick Start
 

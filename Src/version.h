@@ -7,8 +7,8 @@
  * This file contains the version information for the project.
  */
 namespace ProjectVersion {
-    const uint8_t MAJOR = 1; ///< Major version number
-    const uint8_t MINOR = 1; ///< Minor version number
+    const uint8_t MAJOR = 2; ///< Major version number
+    const uint8_t MINOR = 0; ///< Minor version number
 }
 
 /*
@@ -20,5 +20,9 @@ Added heartbeat message with uptime.
 - Version 1.1: Ensure SoC2 recalibration occurs every 60 seconds, not just once after rest.
 Do not send CAN 0x374 response until battery model is initialized.
 
-
+- Version 2.0: Added diagnostic command processing for temperature override.
+Send message 0x721 [01 minTemp maxTemp] to override cell temperatures in 0x374 for 10 seconds.
+Implemented safety checks to prevent unrealistic temperature changes.
+Original cell min/max temperatures are sent in the 0x720 periodic message bytes 2 and 3.
+All temperature values on the CAN bus are one byte, temperature - 50 (ie, 0x01 is -49 C, 0x32 is 0 C)
 */

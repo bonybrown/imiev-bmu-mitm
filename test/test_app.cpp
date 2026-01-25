@@ -275,8 +275,8 @@ TEST(App_CanMsgReceived, Message374_is_replaced)
 
     rxMsg.setSoC1(75.5f);
     rxMsg.setSoC2(73.0f);
-    rxMsg.setCellMaxTemperature(28.0f);
-    rxMsg.setCellMinTemperature(25.0f);
+    rxMsg.setCellMaxTemperature(TemperatureValue(28.0f));
+    rxMsg.setCellMinTemperature(TemperatureValue(25.0f));
     rxMsg.setBatteryCapacity(58.0f);
 
     // Verify queue is empty
@@ -313,8 +313,8 @@ TEST(App_CanMsgReceived, Message374_is_replaced)
     CHECK(txMsg.getBatteryCapacity() != rxMsg.getBatteryCapacity());
 
     // temperatures should be the same
-    DOUBLES_EQUAL(rxMsg.getCellMaxTemperature(), txMsg.getCellMaxTemperature(), 0.01);
-    DOUBLES_EQUAL(rxMsg.getCellMinTemperature(), txMsg.getCellMinTemperature(), 0.01);
+    DOUBLES_EQUAL(rxMsg.getCellMaxTemperature().celsius(), txMsg.getCellMaxTemperature().celsius(), 0.01);
+    DOUBLES_EQUAL(rxMsg.getCellMinTemperature().celsius(), txMsg.getCellMinTemperature().celsius(), 0.01);
 }
 
 TEST(App_CanMsgReceived, Message374_data_matches_battery_model)
@@ -359,8 +359,8 @@ TEST(App_CanMsgReceived, Message374_data_matches_battery_model)
 
     rxMsg.setSoC1(75.5f);
     rxMsg.setSoC2(73.0f);
-    rxMsg.setCellMaxTemperature(22.0f);
-    rxMsg.setCellMinTemperature(23.0f);
+    rxMsg.setCellMaxTemperature(TemperatureValue(22.0f));
+    rxMsg.setCellMinTemperature(TemperatureValue(23.0f));
     rxMsg.setBatteryCapacity(58.0f);
 
     // Verify queue is empty
@@ -394,8 +394,8 @@ TEST(App_CanMsgReceived, Message374_data_matches_battery_model)
     DOUBLES_EQUAL(batteryModel->getSoC2(), txMsg.getSoC2(), 0.05);
     DOUBLES_EQUAL(batteryModel->getCapacity(), txMsg.getBatteryCapacity(), 0.01);
     // temperatures should be the same
-    DOUBLES_EQUAL(rxMsg.getCellMaxTemperature(), txMsg.getCellMaxTemperature(), 0.01);
-    DOUBLES_EQUAL(rxMsg.getCellMinTemperature(), txMsg.getCellMinTemperature(), 0.01);
+    DOUBLES_EQUAL(rxMsg.getCellMaxTemperature().celsius(), txMsg.getCellMaxTemperature().celsius(), 0.01);
+    DOUBLES_EQUAL(rxMsg.getCellMinTemperature().celsius(), txMsg.getCellMinTemperature().celsius(), 0.01);
 }
 
 TEST(App_CanMsgReceived, RealWorldData)
@@ -501,6 +501,30 @@ TEST(App_CanMsgReceived, Message374IsNotForwardedUnlessModelInitialized)
 
     // Verify model is still not initialized
     CHECK_FALSE(batteryModel->isInitialized());
+
+    // Verify message was NOT added to tx queue
+    CHECK(txQueue->isEmpty());
+}
+
+TEST(App_CanMsgReceived, DiagnosticCommandIsNotForwarded)
+{
+    CAN_FRAME frame;
+    frame.ID = Diagnostic::COMMAND_MESSAGE_ID;
+    frame.dlc = 8;
+    frame.ide = 0; // Standard ID
+    frame.rtr = 0; // Data frame
+    frame.rx_channel = 0;
+    CanMessage374 rxMsg(&frame);
+
+    // Verify queue is empty
+    CHECK(txQueue->isEmpty());
+
+    // Expect no calls to battery model update
+    mock().expectNoCall("update");
+
+    // Call canMsgReceived
+    app->canMsgReceived(frame);
+    mock().checkExpectations();
 
     // Verify message was NOT added to tx queue
     CHECK(txQueue->isEmpty());

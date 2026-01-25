@@ -43,14 +43,18 @@ add_executable(MIevM_Tests
     test_voltage_byte.cpp
     test_can_message_373.cpp
     test_can_message_374.cpp
+    test_can_message_374_override.cpp
     test_can_queue.cpp
     test_utility.cpp
+    test_diagnostic.cpp
     ../Src/VoltageByte.cpp
     ../Src/CanMessage373.cpp
     ../Src/CanMessage374.cpp
+    ../Src/CanMessage374Override.cpp
     ../Src/App.cpp
     ../Src/utility.c
     ../Src/BatteryModel.cpp
+    ../Src/Diagnostic.cpp
 )
 
 # Link against CppUTest

@@ -4,6 +4,7 @@
  */
 
 #include "CanMessage374.h"
+#include <TemperatureValue.h>
 
 /**
  * @brief Construct from CAN frame pointer
@@ -45,9 +46,9 @@ float CanMessage374::getSoC2() const
  *
  * @return Maximum temperature in degrees Celsius
  */
-float CanMessage374::getCellMaxTemperature() const
+TemperatureValue CanMessage374::getCellMaxTemperature() const
 {
-    return frame_->data[4] - 50.0f;
+    return TemperatureValue(frame_->data[4]);
 }
 
 /**
@@ -57,9 +58,9 @@ float CanMessage374::getCellMaxTemperature() const
  *
  * @return Minimum temperature in degrees Celsius
  */
-float CanMessage374::getCellMinTemperature() const
+TemperatureValue CanMessage374::getCellMinTemperature() const
 {
-    return frame_->data[5] - 50.0f;
+    return TemperatureValue(frame_->data[5]);
 }
 
 /**
@@ -135,10 +136,9 @@ void CanMessage374::setSoC2(float soc)
  *
  * @param temp Maximum temperature in degrees Celsius
  */
-void CanMessage374::setCellMaxTemperature(float temp)
+void CanMessage374::setCellMaxTemperature(TemperatureValue temp)
 {
-    int value = (int)(temp + 50.0f + 0.5f); // Round to nearest
-    frame_->data[4] = clampToUint8(value);
+    frame_->data[4] = temp.toCanByte();
 }
 
 /**
@@ -148,10 +148,9 @@ void CanMessage374::setCellMaxTemperature(float temp)
  *
  * @param temp Minimum temperature in degrees Celsius
  */
-void CanMessage374::setCellMinTemperature(float temp)
+void CanMessage374::setCellMinTemperature(TemperatureValue temp)
 {
-    int value = (int)(temp + 50.0f + 0.5f); // Round to nearest
-    frame_->data[5] = clampToUint8(value);
+    frame_->data[5] = temp.toCanByte();
 }
 
 /**

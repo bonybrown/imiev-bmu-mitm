@@ -365,8 +365,6 @@ TEST(BatteryModel_VoltageCalibration, RecalibratesEvery60SecondsAtRest)
     restVoltage = VoltageByte::fromVoltage(3.91f);
     model->update(restVoltage, 0.0f, 100);
     float socAfterSingleUpdate = model->getSoC2();
-    printf("SoC after single update: %f\n", socAfterSingleUpdate);
-    printf("SoC after rest 1: %f\n", socAfterRest1);
     CHECK(socAfterSingleUpdate == socAfterRest1); // No recalibration yet
 
     // Continue resting for another 60 seconds

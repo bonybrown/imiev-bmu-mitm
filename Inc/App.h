@@ -13,6 +13,7 @@
 #include <stdint.h>
 #include "can_types.h"
 #include "BatteryModel.h"
+#include "Diagnostic.h"
 
 // Forward declaration
 template<uint16_t CAPACITY> class CanQueue;
@@ -35,7 +36,8 @@ public:
      m_ticks(0), 
      m_one_second(1000),
      m_seconds(0),
-     m_batteryModel(batteryModel) {} 
+     m_batteryModel(batteryModel),
+     m_diagnostic() {} 
     /**
      * @brief Called when a CAN message is received
      * @param frame The received CAN frame
@@ -60,10 +62,7 @@ protected:
     int32_t m_one_second;    ///< Counter for one second intervals
     uint32_t m_seconds;      ///< Elapsed seconds counter
     BatteryModel* m_batteryModel; ///< Pointer to the BatteryModel instance
-    /**
-     * @brief Send a heartbeat CAN message
-     */
-    void sendHeartbeat();
+    Diagnostic m_diagnostic; ///< Diagnostic handler
 };
 
 

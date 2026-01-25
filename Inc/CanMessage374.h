@@ -17,6 +17,7 @@
 
 #include <stdint.h>
 #include "can_types.h"
+#include <TemperatureValue.h>
 
 /**
  * @class CanMessage374
@@ -52,13 +53,13 @@ public:
      * @brief Get cell maximum temperature
      * @return Maximum temperature in degrees Celsius
      */
-    float getCellMaxTemperature() const;
+    TemperatureValue getCellMaxTemperature() const;
     
     /**
      * @brief Get cell minimum temperature
      * @return Minimum temperature in degrees Celsius
      */
-    float getCellMinTemperature() const;
+    TemperatureValue getCellMinTemperature() const;
     
     /**
      * @brief Get battery 100% capacity
@@ -89,13 +90,13 @@ public:
      * @brief Set cell maximum temperature
      * @param temp Maximum temperature in degrees Celsius
      */
-    void setCellMaxTemperature(float temp);
+    void setCellMaxTemperature(TemperatureValue temp);
     
     /**
      * @brief Set cell minimum temperature
      * @param temp Minimum temperature in degrees Celsius
      */
-    void setCellMinTemperature(float temp);
+    void setCellMinTemperature(TemperatureValue temp);
     
     /**
      * @brief Set battery 100% capacity
