@@ -106,6 +106,22 @@ TEST(CanMessage374Override, ExpiresAfterFrameCount)
     CHECK_FALSE(applied);
 }
 
+TEST(CanMessage374Override, RecordsOriginalTempsEvenIfNoOverrideApplied)
+{
+    CanMessage374 msg(&frame);
+    // Initial cell temperatures
+    float minTemp = msg.getCellMinTemperature().celsius();
+    float maxTemp = msg.getCellMaxTemperature().celsius();
+
+    // Try to apply override with zero frames (inactive)
+    bool applied = tempOverride->applyOverride(msg);
+    CHECK_FALSE(applied);
+
+    // Original values should still be recorded
+    DOUBLES_EQUAL(minTemp, tempOverride->getOriginalMinTemp().celsius(), 0.1f);
+    DOUBLES_EQUAL(maxTemp, tempOverride->getOriginalMaxTemp().celsius(), 0.1f);
+}
+
 TEST(CanMessage374Override, DoesNotApplyWhenInactive)
 {
     CanMessage374 msg(&frame);
@@ -176,22 +192,22 @@ TEST(CanMessage374Override, MultipleOverridesInSequence)
     CHECK_EQUAL(1, tempOverride->getRemainingFrames());
 }
 
-TEST(CanMessage374Override, RejectsUnrealisticCoolingAbove25C)
+TEST(CanMessage374Override, RejectsUnrealisticCoolingAbove40C)
 {
     CanMessage374 msg(&frame);
     
-    // Set current temperature to 30°C (above 25°C)
-    msg.setCellMinTemperature(TemperatureValue(28.0f));
-    msg.setCellMaxTemperature(TemperatureValue(30.0f));
+    // Set current temperature to 45°C (above 40°C)
+    msg.setCellMinTemperature(TemperatureValue(42.0f));
+    msg.setCellMaxTemperature(TemperatureValue(45.0f));
     
-    // Try to override with temp below 25°C
-    tempOverride->setOverride(TemperatureValue(20.0f), TemperatureValue(24.0f), 5);
+    // Try to override with temp below 40°C
+    tempOverride->setOverride(TemperatureValue(35.0f), TemperatureValue(39.0f), 5);
     bool applied = tempOverride->applyOverride(msg);
     
     CHECK_FALSE(applied);
     // Temperature should remain unchanged
-    DOUBLES_EQUAL(28.0f, msg.getCellMinTemperature().celsius(), 0.1f);
-    DOUBLES_EQUAL(30.0f, msg.getCellMaxTemperature().celsius(), 0.1f);
+    DOUBLES_EQUAL(42.0f, msg.getCellMinTemperature().celsius(), 0.1f);
+    DOUBLES_EQUAL(45.0f, msg.getCellMaxTemperature().celsius(), 0.1f);
     // Frame counter should still decrement
     CHECK_EQUAL(4, tempOverride->getRemainingFrames());
 }

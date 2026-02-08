@@ -18,16 +18,20 @@ void CanMessage374Override::setOverride(TemperatureValue minTemp, TemperatureVal
 
 bool CanMessage374Override::applyOverride(CanMessage374& msg)
 {
+    // Store original values
+    m_originalMinTemp = msg.getCellMinTemperature();
+    m_originalMaxTemp = msg.getCellMaxTemperature();
+
     if (m_remainingFrames == 0) {
         return false;
     }
 
     // Get current temperatures for safety checks
-    float currentMaxTemp = msg.getCellMaxTemperature().celsius();
+    float currentMaxTemp = m_originalMaxTemp.celsius();
 
     // Safety check 1: Prevent unrealistic cooling
-    // If current temp > 25°C and override < 25°C, reject
-    if (currentMaxTemp > 25.0f && m_overrideMaxTemp.celsius() < 25.0f) {
+    // If current temp > 40°C and override < 40°C, reject
+    if (currentMaxTemp > 40.0f && m_overrideMaxTemp.celsius() < 40.0f) {
         m_remainingFrames--; // Still consume frame count
         return false;
     }
@@ -39,9 +43,6 @@ bool CanMessage374Override::applyOverride(CanMessage374& msg)
         return false;
     }
 
-    // Store original values
-    m_originalMinTemp = msg.getCellMinTemperature();
-    m_originalMaxTemp = TemperatureValue(currentMaxTemp);
 
     // Apply override
     msg.setCellMinTemperature(m_overrideMinTemp);

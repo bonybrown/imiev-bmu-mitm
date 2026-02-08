@@ -61,7 +61,7 @@ The first byte [0] of the message is the command id. The remaining bytes are par
 
 | Command ID | Description | Parameters | Example |
 |------|---------|-------|------|
-| 1 | **Override Cell min/max temperatures for 10 seconds**<br/>Sends overridden values to the EV-ECU, with the real cell temperatures reported in the Diagnostic Message (0x720). Temperatures on the CAN bus are (°C + 50) . Overrides are inhibited under these conditions:<br/>* If cell max temp is under 10°C → the override max temp must be less than 10°C higher the actual max temp<br/> * If the cell max temp is over 25°C → override max must be higher than 25°C<br/>When the actual cell temp is between 10°C and 25°C the override temperature may be set to any value. | [1] min temp<br>[2] max temp | `01 46 47` set min=20°C, max=21°C|
+| 1 | **Override Cell min/max temperatures for 10 seconds**<br/>Sends overridden values to the EV-ECU, with the real cell temperatures reported in the Diagnostic Message (0x720). Temperatures on the CAN bus are (°C + 50) . Overrides are inhibited under these conditions:<br/>* If cell max temp is under 10°C → the override max temp must be less than 10°C higher the actual max temp<br/> * If the cell max temp is over 40°C → override max must be higher than 40°C<br/>When the actual cell temp is between 10°C and 40°C the override temperature may be set to any value. | [1] min temp<br>[2] max temp | `01 46 47` set min=20°C, max=21°C|
 
 
 ## Quick Start
